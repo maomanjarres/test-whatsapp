@@ -1,0 +1,18 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Test de multisesiones de Whatsapp
+  </h1>
+</div>
+
+<ngx-qrcode [elementType]="elementType" 
+      [value] = "valueCode"
+      cssClass = "aclass"
+      errorCorrectionLevel = "L">
+</ngx-qrcode>
+
+<input type="text" [(ngModel)]="valueKey">
+<button class="btn" (click)="refreshCode()"> refresh </button>
+<button class="btn" (click)="deleteAllSessions()"> Delete ALL sessions </button>
+<button class="btn" (click)="getAllSessions()"> Get ALL sessions </button>
+
