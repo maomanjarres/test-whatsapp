@@ -5,29 +5,22 @@ const qrcode = require('qrcode-terminal');
 const { Client, Events } = require('whatsapp-web.js');
 const { Observable } = require('rxjs');
 
-const SESSIONS_FOLDER = './sessions/'
-
 let qrResult;
 let wsClients = [];
-let sessionData;
+const PREFIX = 'session_';
+const SUFFIX = '.json';
+const SESSIONS_FOLDER = './sessions/'
 
 /***********************************************************************************************************
  * Borramos archivo de sesion
  ***********************************************************************************************************/
 const deleteSession = (file) => {
-    return new Observable(observer => {
-        // Borrar archivo JSON
-        fs.unlink(file, (err) => {
-            if (err) {
-                console.error(err)
-                observer.next(false);
-            } else {
-                console.info(chalk.green('Whatsapp: ') + chalk.red('Se ha borrado la sesión.'));
-                observer.next(true);
-            }
-            observer.complete();
-        });
-
+    fs.unlink(file, (err) => {
+        if (err) {
+            console.error(err)
+        } else {
+            console.info(chalk.green('Whatsapp: ') + chalk.red('Se ha borrado la sesión.'));
+        }
     });
 }
 
@@ -72,7 +65,7 @@ const prepareCliente = (client, file) => {
         setTimeout(() => {
             // IMPORTANTE: Se le adiciona a la session el numero telefónico.
             session.phonenumber = client.info.wid.user;
-            sessionName = 'session_' + session.phonenumber + '.json';
+            sessionName = PREFIX + session.phonenumber + SUFFIX;
             fs.writeFile(SESSIONS_FOLDER + sessionName, JSON.stringify(session), (callback) => {
                 if (callback) {
                     console.error(callback);
@@ -100,7 +93,7 @@ const prepareCliente = (client, file) => {
         spinner.stop();
         console.error(chalk.red('Error de autenticacón. Se borrará el archivo ' + file + '!!'));
         // Borramos el archivo
-        deleteSession(SESSIONS_FOLDER + file).subscribe();
+        deleteSession(SESSIONS_FOLDER + file);
     });
 
     // Iniciamos el cliente de Whatsapp...
@@ -142,10 +135,10 @@ const listenAllSessions = () => {
 
     fs.readdir(SESSIONS_FOLDER, (err, files) => {
         files.forEach(file => {
-            sessionData = require(SESSIONS_FOLDER + file);
+            const sessionFile = require(SESSIONS_FOLDER + file);
             
             var client = new Client({
-                session: sessionData,
+                session: sessionFile,
             });
 
             prepareCliente(client, file);
@@ -171,15 +164,19 @@ exports.deleteAllSession = () => {
     return new Observable(observer => {
         let sessionsActive = 0;
         fs.readdir(SESSIONS_FOLDER, (err, files) => {
-            files.forEach(file => {
-                deleteSession(SESSIONS_FOLDER + file).subscribe(r => {
+            if (files.length === 0) {
+                observer.next('No hay sesiones asociadas');
+                observer.complete();
+            } else {
+                files.forEach(file => {
+                    deleteSession(SESSIONS_FOLDER + file);
                     sessionsActive++;
                     if (sessionsActive === files.length) {
                         observer.next('Se ha eliminado ' + sessionsActive + ' sesiones');
                         observer.complete();
                     }
                 });
-            });
+            }
         });
     });
 }

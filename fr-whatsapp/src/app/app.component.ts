@@ -28,9 +28,9 @@ export class AppComponent {
 
   deleteAllSessions() {
     this.salida = '...Solicitando borrado de sesiones';
-    this.whatsappService.deleteAllSessions().subscribe(r=> {
+    this.whatsappService.deleteAllSessions().subscribe((r: any)=> {
       console.log(r);
-      this.salida = JSON.stringify(r);
+      this.salida = r.data;
     }, err => {
       this.salida = err.message;
     });
@@ -38,9 +38,9 @@ export class AppComponent {
 
   getAllSessions() {
     this.salida = '...Solicitando lista de sesiones';
-    this.whatsappService.getAllClients().subscribe(r => {
+    this.whatsappService.getAllClients().subscribe((r: any) => {
       console.log(r);
-      this.salida = JSON.stringify(r);
+      this.salida = JSON.stringify(r.data);
     }, err => {
       this.salida = err.message;
     });
