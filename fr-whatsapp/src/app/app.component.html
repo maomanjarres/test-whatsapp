@@ -4,15 +4,27 @@
     Test de multisesiones de Whatsapp
   </h1>
 </div>
+<div style="text-align:center">
+  <ngx-qrcode [elementType]="elementType" 
+        [value] = "valueCode"
+        cssClass = "aclass"
+        errorCorrectionLevel = "L">
+  </ngx-qrcode>
 
-<ngx-qrcode [elementType]="elementType" 
-      [value] = "valueCode"
-      cssClass = "aclass"
-      errorCorrectionLevel = "L">
-</ngx-qrcode>
+  <!-- <input type="text" [(ngModel)]="valueKey"> -->
+  <div>
+    <button class="btn" (click)="refreshCode()"> Solicitar nuevo QR </button>
+  </div>
+  <div>
+    <button class="btn" (click)="deleteAllSessions()"> Borrar Todas las Sesiones </button>
+  </div>
+  <div>
+    <button class="btn" (click)="getAllSessions()"> Traer todas las Sesiones </button>
+  </div>
 
-<input type="text" [(ngModel)]="valueKey">
-<button class="btn" (click)="refreshCode()"> refresh </button>
-<button class="btn" (click)="deleteAllSessions()"> Delete ALL sessions </button>
-<button class="btn" (click)="getAllSessions()"> Get ALL sessions </button>
+  <div>
+    <textarea name="salida" id="salida" class="memo" [(ngModel)]="salida" rows="10"></textarea>
+  </div>
 
+  <p>Ejemplo de llamada a API de Whatsapp, utilizando la guía <a href="https://waguide.pedroslopez.me/features/resuming-sessions">whatsapp-web.js</a></p>
+</div>

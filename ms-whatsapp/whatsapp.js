@@ -32,21 +32,6 @@ const deleteSession = (file) => {
 }
 
 /***********************************************************************************************************
- * Escribimos archivo de sesion
- ***********************************************************************************************************/
-const writeSession = (client, sessionData) => {
-    setTimeout(()=> {
-        sessionData.phonenumber = client.info.wid.user;
-        sessionName = 'session_' + sessionData.phonenumber + '.json';
-        fs.writeFile(SESSIONS_FOLDER + sessionName, JSON.stringify(sessionData), (callback) => {
-            if (callback) {
-                console.error(callback);
-            }
-        });
-    },1000);
-}
-
-/***********************************************************************************************************
  * Escuchando mensajes del cliente
  ***********************************************************************************************************/
 const listenMessage = (client) => {
@@ -56,10 +41,10 @@ const listenMessage = (client) => {
             const { from, to, body } = msg;
             console.info(`${chalk.yellow('De: ' + from)}`, `${chalk.blue('Para: ' + to)}`, body);
 
-            if (body.toLowerCase() === 'samu')
-                sendMessage(client, from, 'Te amo hijo');
-            if (body.toLowerCase() === 'pelu')
-                sendMessage(client, from, 'Te amo esposa');
+            if (body.toLowerCase() === 'x-hola')
+                sendMessage(client, from, 'Como estás?');
+            if (body.toLowerCase() === 'x-test')
+                sendMessage(client, from, 'Test satisfactorio!');
         });
     } else {
         console.info('listenMessage: ERROR', client.info);
@@ -82,7 +67,16 @@ const prepareCliente = (client, file) => {
     // Al autenticar usuario (escaneo del QR), se guardar la session en el archivo SESSION_FILE_PATH
     client.on(Events.AUTHENTICATED, (session) => {
         qrResult = undefined;
-        writeSession(client, session);
+        // Un letardo para obtener info de la session
+        setTimeout(() => {
+            session.phonenumber = client.info.wid.user;
+            sessionName = 'session_' + session.phonenumber + '.json';
+            fs.writeFile(SESSIONS_FOLDER + sessionName, JSON.stringify(session), (callback) => {
+                if (callback) {
+                    console.error(callback);
+                }
+            });
+        }, 1000);
     });
     
     // Al desconectar
@@ -104,6 +98,10 @@ const prepareCliente = (client, file) => {
         deleteSession(SESSIONS_FOLDER + file).subscribe();
     });
 
+    // Acumulador de clientes de Whatsapp...
+    wsClients.push(client);
+
+    // Iniciamos el cliente de Whatsapp...
     client.initialize();
 }
 
@@ -122,7 +120,7 @@ exports.generateSession = () => {
             // Generando QRCODE
             client.on(Events.QR_RECEIVED, qr => {
                 qrResult = qr;
-                console.info(chalk.green('Whatsapp: ') + 'QR code generado');
+                console.info(chalk.green('Whatsapp: ') + 'Código QR generado');
                 observer.next(qrResult);
                 observer.complete();
                 // qrcode.generate(qr, { small: true });
@@ -134,7 +132,7 @@ exports.generateSession = () => {
 }
 
 /***********************************************************************************************************
- * Esta funcion inicia el Listener de los clientes de la carpeta SESSION_FOLDER
+ * Esta funcion recupera las sesiones de los clientes de la carpeta SESSION_FOLDER
  ***********************************************************************************************************/
 var spinner = ora(`${chalk.green('Whatsapp: ')} Cargando ${chalk.yellow('Validando sesiones activas en Whatsapp...')}`);
 const listenAllSessions = () => {    
@@ -147,7 +145,6 @@ const listenAllSessions = () => {
             var client = new Client({
                 session: sessionData,
             });
-            wsClients.push(client);
 
             prepareCliente(client, file);
         });
