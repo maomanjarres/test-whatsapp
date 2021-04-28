@@ -66,9 +66,11 @@ const prepareCliente = (client, file) => {
 
     // Al autenticar usuario (escaneo del QR), se guardar la session en el archivo SESSION_FILE_PATH
     client.on(Events.AUTHENTICATED, (session) => {
+        // Reset el qrResult para que el llamado a generar nuevo QR, genere otro cliente
         qrResult = undefined;
         // Un letardo para obtener info de la session
         setTimeout(() => {
+            // IMPORTANTE: Se le adiciona a la session el numero telefónico.
             session.phonenumber = client.info.wid.user;
             sessionName = 'session_' + session.phonenumber + '.json';
             fs.writeFile(SESSIONS_FOLDER + sessionName, JSON.stringify(session), (callback) => {
@@ -76,6 +78,9 @@ const prepareCliente = (client, file) => {
                     console.error(callback);
                 }
             });
+
+            // Acumulador de clientes de Whatsapp...
+            wsClients.push(client);
         }, 1000);
     });
     
@@ -97,9 +102,6 @@ const prepareCliente = (client, file) => {
         // Borramos el archivo
         deleteSession(SESSIONS_FOLDER + file).subscribe();
     });
-
-    // Acumulador de clientes de Whatsapp...
-    wsClients.push(client);
 
     // Iniciamos el cliente de Whatsapp...
     client.initialize();

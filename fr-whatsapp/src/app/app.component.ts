@@ -15,12 +15,13 @@ export class AppComponent {
   constructor(private whatsappService:   WhatasappService) {}
 
   refreshCode() {
-    this.valueCode = 'dummy-code';
     this.salida = '...Solicitando QR';
 
     this.whatsappService.getQRCode(this.valueKey).subscribe((r: { data: string }) => {
       this.valueCode = r.data;
+      this.salida = 'OK';
     }, err => {
+      this.valueCode = 'dummy-code';
       this.salida = err.message;
     });
   }
@@ -29,6 +30,7 @@ export class AppComponent {
     this.salida = '...Solicitando borrado de sesiones';
     this.whatsappService.deleteAllSessions().subscribe(r=> {
       console.log(r);
+      this.salida = JSON.stringify(r);
     }, err => {
       this.salida = err.message;
     });
@@ -38,6 +40,7 @@ export class AppComponent {
     this.salida = '...Solicitando lista de sesiones';
     this.whatsappService.getAllClients().subscribe(r => {
       console.log(r);
+      this.salida = JSON.stringify(r);
     }, err => {
       this.salida = err.message;
     });

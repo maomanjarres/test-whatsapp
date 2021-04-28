@@ -1,4 +1,8 @@
-# QrcodeGenerator
+# MS-Whatsapp
+
+Este proyecto es un simple test de pruebas utilizando la guía [whatsapp-web.js](https://waguide.pedroslopez.me/features/resuming-sessions).
+
+Requieres levantar el servicio ms-whatsapp (leer el README en la carpeta [ms-whatsapp](https://github.com/maomanjarres/test-whatsapp/tree/master/ms-whatsapp))
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.9.
 
